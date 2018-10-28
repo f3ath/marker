@@ -1,11 +1,15 @@
 import 'package:markdown/src/ast.dart';
-import 'package:markdown_printer/src/default_ruleset.dart';
-import 'package:markdown_printer/src/visitor.dart';
+import 'package:marker/src/default_rules.dart';
+import 'package:marker/src/visitor.dart';
 
+/// Markdown renderer
 class Renderer {
+  /// Use [rules] to provide custom rendering rules.
+  /// See [DefaultRules] for more details.
   Renderer([Rules rules]) : rules = rules ?? DefaultRules();
   final Rules rules;
 
+  /// Renders the given [nodes] into string.
   String render(List<Node> nodes) {
     final visitor = Visitor(rules);
     nodes.forEach((node) => node.accept(visitor));

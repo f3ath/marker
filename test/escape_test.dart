@@ -1,4 +1,4 @@
-import 'package:markdown_printer/escape.dart' as md;
+import 'package:marker/escape.dart' as md;
 import 'package:test/test.dart';
 
 void main() {

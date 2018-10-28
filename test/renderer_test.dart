@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:markdown/markdown.dart';
-import 'package:markdown_printer/markdown_renderer.dart';
+import 'package:marker/marker.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -10,7 +10,6 @@ void main() {
     final nodes = Document().parseLines(example.readAsLinesSync());
     final renderer = new Renderer();
     final text = renderer.render(nodes);
-//    print(text);
     final expected = Logger();
     nodes.forEach((n) => n.accept(expected));
     final actual = Logger();

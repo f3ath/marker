@@ -1,6 +1,5 @@
 import 'package:markdown/markdown.dart';
-import 'package:markdown_printer/escape.dart' as md;
-import 'package:markdown_printer/markdown_renderer.dart';
+import 'package:marker/marker.dart';
 
 class DefaultRules implements Rules {
   String _listMarker;
@@ -52,13 +51,7 @@ class DefaultRules implements Rules {
   };
 
   @override
-  void onText(String text, Context context) {
-    if (_elements.isNotEmpty && _elements.last.tag == 'code') {
-      context.write(text);
-      return;
-    }
-    context.write(md.escape(text));
-  }
+  void onText(String text, Context context) => context.write(text);
 
   @override
   void onExit(Element element, String text, Context context) {
