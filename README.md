@@ -39,7 +39,6 @@ Node convertUlToOl(Node node) {
 The `Renderer()` constructor accepts optional arguments which can be used to alter its behavior.
 
 ## Known issues
-- Reference links and images are not implemented yet.
 - The default rules may not process all tags properly. Please open an issue in this case.
 - Some special characters (e.g. `*` or `[]`) may not be escaped in the resulting text. A more intelligent
  escaping logic is work in progress.
