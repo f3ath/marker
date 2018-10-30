@@ -3,7 +3,7 @@ import 'package:marker/marker.dart';
 
 /// The default text handler.
 String textHandler(String text, Context ctx) {
-  if (ctx.path.last != null && ctx.path.last.tag == 'code') {
+  if (ctx.path.length > 0 && ctx.path.last.tag == 'code') {
     return text;
   }
   return md.escape(text);
@@ -30,18 +30,22 @@ final Map<String, ElementPrinter> _handlers = {
   'br': (attr, text, ctx) => '  \n',
   'hr': (attr, text, ctx) => '***\n',
   'img': (attr, text, ctx) {
-    var title = '';
-    if (attr.containsKey('title')) {
-      title = ' "${attr['title']}"';
+    final title = attr.containsKey('title') ? ' "${attr['title']}"' : '';
+    if (ctx.inlineImages) {
+      return '![${attr['alt']}](${attr['src']}${title})';
     }
-    return '![${attr['alt']}](${attr['src']}${title})';
+    final id = 'img${md.id()}';
+    ctx.writeDelayed('![${id}]: ${attr['src']}${title}');
+    return '![${id}]';
   },
   'a': (attr, text, ctx) {
-    String title = '';
-    if (attr.containsKey('title')) {
-      title = ' "${attr['title']}"';
+    final title = attr.containsKey('title') ? ' "${attr['title']}"' : '';
+    if (ctx.inlineLinks) {
+      return '[${text}](${attr['href']}$title)';
     }
-    return '[${text}](${attr['href']}$title)';
+    final id = 'link${md.id()}';
+    ctx.writeDelayed('[${id}]: ${attr['href']}${title}');
+    return '[$text][${id}]';
   },
   'blockquote': (attr, text, ctx) {
     final prefix = '> ';

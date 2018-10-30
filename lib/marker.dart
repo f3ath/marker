@@ -40,9 +40,12 @@ abstract class Context {
   writeDelayed(String text);
 }
 
-/// Prints a text node. this function should escape special characters.
+/// Prints a text node.
+/// This function is called by the [NodeVisitor] for every text node.
+/// It should escape special characters.
 typedef String TextPrinter(String text, Context context);
 
 /// Prints a markdown element with the given [attributes] and [innerMarkdown].
+/// This function is called by [NodeVisitor] after it visits the element.
 typedef String ElementPrinter(
     Map<String, String> attributes, String innerMarkdown, Context context);

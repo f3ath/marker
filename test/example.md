@@ -9,6 +9,8 @@ This *line* break right
 here **should** remain.
 
 
+Ref [link][my_id] is here.
+
 This is an image: ![Alt text](https://daringfireball.net/graphics/logos/ "Image title").
 
 This is also an image: ![](https://daringfireball.net/graphics/logos/).
@@ -64,3 +66,5 @@ some
 
 
 Another paragraph.
+
+[my_id]: https://example.com "yo"
