@@ -1,4 +1,4 @@
-import 'package:marker/escape.dart' as md;
+import 'package:marker/helpers.dart' as md;
 import 'package:test/test.dart';
 
 void main() {

@@ -1,37 +1,49 @@
 import 'package:markdown/markdown.dart';
 import 'package:marker/marker.dart';
 
+/// The [Visitor] walks over the list of nodes and renders markdown text
+/// with the given [textPrinter] and [elementPrinters].
 class Visitor implements NodeVisitor, Context {
-  Visitor(this.rules);
+  Visitor(this.textPrinter, this.elementPrinters, this.inlineImages,
+      this.inlineLinks);
 
-  final Rules rules;
+  final TextPrinter textPrinter;
+  final Map<String, ElementPrinter> elementPrinters;
+  final bool inlineImages;
+  final bool inlineLinks;
 
-  StringBuffer _buffer = StringBuffer();
-
-  final List<StringBuffer> _bufferStack = [];
-  final List<Element> _elementStack = [];
+  final List<StringBuffer> _buff = [StringBuffer()];
+  final List<Element> _path = [];
+  final List<String> _delayed = [];
 
   @override
-  void visitText(Text text) => rules.onText(text.textContent, this);
+  void visitText(Text text) =>
+      _buff.last.write(textPrinter(text.textContent, this));
 
   @override
   void visitElementAfter(Element element) {
-    final text = _buffer.toString();
-    _buffer = _bufferStack.removeLast();
-    rules.onExit(element, text, this);
-    _elementStack.removeLast();
+    final tag = element.tag;
+    String text = _buff.last.toString();
+    _buff.removeLast();
+    if (elementPrinters.containsKey(tag)) {
+      text = elementPrinters[tag](element.attributes, text, this);
+    }
+    _buff.last.write(text);
+    _path.removeLast();
   }
 
   @override
   bool visitElementBefore(Element element) {
-    _elementStack.add(element);
-    _bufferStack.add(_buffer);
-    _buffer = StringBuffer();
-    rules.onEnter(element, this);
+    _path.add(element);
+    _buff.add(StringBuffer());
     return true;
   }
 
-  write(String text) => _buffer.write(text);
+  List<Element> get path => List.unmodifiable(_path);
 
-  String getMarkdown() => _buffer.toString();
+  writeDelayed(String text) => _delayed.add(text);
+
+  void dumpDelayed() => _delayed.forEach(_buff.last.write);
+
+  String get markdown => _buff.last.toString();
 }

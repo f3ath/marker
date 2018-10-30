@@ -36,8 +36,7 @@ Node convertUlToOl(Node node) {
 ```
 
 ## Custom rendering rules
-The `Renderer()` constructor accepts an optional `rules` argument. This way you can provide your own
-rendering rules. See `DefaultRules` for more details.
+The `Renderer()` constructor accepts optional arguments which can be used to alter its behavior.
 
 ## Known issues
 - Reference links and images are not implemented yet.
