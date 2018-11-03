@@ -1,44 +1,30 @@
 # marker
 
 Marker is a Markdown renderer (printer) for Dart. It takes a list of `Node` objects produced by
-the [parser](https://pub.dartlang.org/packages/markdown) and renders it back to `String`.
+the [parser](https://pub.dartlang.org/packages/markdown) and renders it back to a string.
 
-#### Example (from [change_list.dart](./example/change_list.dart))
-The following code displays the contents of `CHANGELOG.md` with all first-level
-unordered lists changed into ordered ones.
+Supported markdown flavors:
+- [original](https://daringfireball.net/projects/markdown/syntax)
+- changelog
+- any custom flavor
+
+The renderer supports both inline and reference links and images.
+
+#### Example
 ```dart
 import 'dart:io';
 
 import 'package:markdown/markdown.dart';
 import 'package:marker/marker.dart';
 
+/// Renders CHANGELOG.md with all links inline
 void main() {
-  final changelog = File('CHANGELOG.md');
-
-  final nodes = Document()
-      // Parse the file content into a list of nodes
-      .parseLines(changelog.readAsLinesSync())
-      // Replace all 1st level `ul` with `ol`
-      .map(convertUlToOl)
-      // Convert back to a list
-      .toList();
-
-  // Render the modified nodes back to text and print
-  print(Renderer().render(nodes));
+  final file = File('CHANGELOG.md');
+  /// Contains parsed tree
+  final nodes = Document().parseLines(file.readAsLinesSync());
+  /// Contains markdown text
+  final markdown = render(nodes);
+  print(markdown);
 }
 
-Node convertUlToOl(Node node) {
-  if (node is Element && node.tag == 'ul') {
-    return Element('ol', node.children)..attributes.addAll(node.attributes);
-  }
-  return node;
-}
 ```
-
-## Custom rendering rules
-The `Renderer()` constructor accepts optional arguments which can be used to alter its behavior.
-
-## Known issues
-- The default rules may not process all tags properly. Please open an issue in this case.
-- Some special characters (e.g. `*` or `[]`) may not be escaped in the resulting text. A more intelligent
- escaping logic is work in progress.
