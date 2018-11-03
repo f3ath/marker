@@ -4,12 +4,18 @@
 #### This is H4 with [*italic* link](https://example.com)
 ##### This is H5 with a ```code block```
 ###### This is H6
-
 This *line* break right  
 here **should** remain.
 
+1\. this
+1\. is not
+1\. a list
 
-Ref [link][my_id] is here.
+This is not an \*em\*
+
+This is not
+
+Ref [link](https://example.com "yo") is here.
 
 This is an image: ![Alt text](https://daringfireball.net/graphics/logos/ "Image title").
 
@@ -22,7 +28,6 @@ Ordered:
 Unordered:
 - one
 - two
-
 
 Here goes a horizontal line
 ***
@@ -64,7 +69,4 @@ some
     code
 ```
 
-
 Another paragraph.
-
-[my_id]: https://example.com "yo"
