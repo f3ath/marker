@@ -10,7 +10,7 @@ Supported markdown flavors:
 
 The renderer supports both inline and reference links and images.
 
-#### Example (from [changelog.dart](./example/changelog.dart))
+#### Example
 ```dart
 import 'dart:io';
 
