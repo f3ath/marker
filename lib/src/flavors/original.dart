@@ -1,15 +1,9 @@
 import 'package:marker/ast.dart';
-import 'package:marker/marker.dart';
 
-isBlock(node) =>
-    node is Header ||
-    node is Paragraph ||
-    node is BlockQuote ||
-    node is OrderedList ||
-    node is UnorderedList;
-
-
-
+/**
+ * This is an implementation of the original markdown
+ * https://daringfireball.net/projects/markdown/syntax
+ */
 
 class Header extends Node {
   final int level;
@@ -53,7 +47,7 @@ class OrderedList extends Node {
 
 class ListItem extends Node {
   render(Context context) {
-    if (children.isNotEmpty && isBlock(children.first)) {
+    if (children.isNotEmpty && _isBlock(children.first)) {
       return children
               .map((node) {
                 if (node is BlockQuote) {
@@ -80,13 +74,18 @@ class ListItem extends Node {
 class Pre extends Node {}
 
 class Code extends Node {
+  final _buf = StringBuffer();
+
   render(Context context) {
-    final text = super.render(context);
+    final text = _buf.toString();
     if (text.contains('\n')) return '    ' + text.split('\n').join('\n    ');
-    int len = 1;
-    while (text.contains('`' * len)) len++; // Figure out the fencing length
-    return '`' * len + text + '`' * len;
+    int fencing = 1;
+    while (text.contains('`' * fencing))
+      fencing++; // Figure out the fencing length
+    return '`' * fencing + text + '`' * fencing;
   }
+
+  addText(String text) => _buf.write(text);
 }
 
 class HorizontalRule extends Node {
@@ -113,7 +112,7 @@ class Link extends Node {
       return '${innerText}(${href})';
     }
     final id = '[id${_id++}]';
-    context.footer.add('$id: ${href}');
+    context.references.add('$id: ${href}');
     return '${innerText}${id}';
   }
 }
@@ -129,9 +128,16 @@ class Image extends Node {
       return '![$alt](${src})';
     }
     final id = '[id${_id++}]';
-    context.footer.add('${id}: ${src}');
+    context.references.add('${id}: ${src}');
     return '![${alt}]${id}';
   }
 }
 
-int _id = 1;
+int _id = 1; // id generator for images and links
+
+_isBlock(node) =>
+    node is Header ||
+    node is Paragraph ||
+    node is BlockQuote ||
+    node is OrderedList ||
+    node is UnorderedList;

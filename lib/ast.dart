@@ -1,14 +1,35 @@
 import 'package:markdown/markdown.dart' as md;
-import 'package:marker/marker.dart';
 
+/// Provides the rendering context.
+class Context {
+  Context(this.inlineImages, this.inlineLinks);
+
+  /// Whether the images should be rendered inline (or as references)
+  final bool inlineImages;
+
+  /// Whether the links should be rendered inline (or as references)
+  final bool inlineLinks;
+
+  /// Accumulates references to images and links generated during rendering.
+  /// When the rendering is done, these lines will be added to the bottom
+  /// of the generated document.
+  final List<String> references = [];
+}
+
+/// Builds the rendering tree by visiting the parsed nodes.
+/// The [flavor] maps the element tags to [NodeConstructor]. For every
+/// element in the parsed tree [NodeConstructor] produces a node of
+/// the rendering tree. The special '_' key should contain a constructor
+/// for the root node.
 class Builder implements md.NodeVisitor {
-  Builder(this._factory) {
-    _stack.add(_factory['_']());
+  Builder(this.flavor) {
+    _stack.add(flavor['_']());
   }
 
-  final Map<String, NodeConstructor> _factory;
+  final Map<String, NodeConstructor> flavor;
   final List<Node> _stack = [];
 
+  /// Contains the root of the rendering tree
   Node get root => _stack.last;
 
   @override
@@ -20,13 +41,13 @@ class Builder implements md.NodeVisitor {
   void visitElementAfter(md.Element element) {
     final node = _stack.last;
     _stack.removeLast();
-    _stack.last.addChild(node);
+    _stack.last.children.add(node);
   }
 
   @override
   bool visitElementBefore(md.Element element) {
     final tag = element.tag;
-    final node = _factory.containsKey(tag) ? _factory[tag]() : _factory['_']();
+    final node = flavor.containsKey(tag) ? flavor[tag]() : flavor['_']();
     node.attributes.addAll(element.attributes);
     _stack.add(node);
     return true;
@@ -35,52 +56,62 @@ class Builder implements md.NodeVisitor {
 
 typedef Node NodeConstructor();
 
-abstract class Printable {
+/// The base interface for the rendering tree nodes.
+abstract class PrintableNode {
+  /// Renders the node into markdown according to [context].
   String render(Context context);
 
+  /// Adds a text node from the parsed tree.
   void addText(String text);
 }
 
-class Text implements Printable {
+/// This is the internal text node. Accumulates text content.
+class Text implements PrintableNode {
   final _buf = StringBuffer();
-
-  Text(String text) {
-    _buf.write(text);
-  }
 
   addText(String text) => _buf.write(text);
 
+  /// Escapes common markdown special characters if those could be
+  /// misinterpreted.
   render(Context context) => _buf
       .toString()
-      // dot after a number
+      // dot after a number in the beginning of the string is a list item
       .replaceAllMapped(RegExp(r'^(\d+)\. '), (m) => '${m[1]}\\. ')
-      //
-      .replaceAllMapped(RegExp(r'[*_]'), (m) => '\\${m[0]}');
+      // Special markdown chars: emphasis, strikethrough, table cell, links
+      .replaceAllMapped(RegExp(r'[*_~|\[\]]'), (m) => '\\${m[0]}')
+      // + and - in the beginning of the string is a list item
+      .replaceAllMapped(RegExp(r'^[+-] '), (m) => '\\${m[0]}')
+      // # in the beginning of the string is a header
+      .replaceAllMapped(RegExp(r'^#'), (m) => '\\${m[0]}');
 }
 
-class Node implements Printable {
-  final List<Printable> _children = [];
+/// The base rendering tree node.
+class Node implements PrintableNode {
+  /// Node's children
+  final List<PrintableNode> children = [];
 
+  /// Attributes are copied from the corresponding parsed tree
+  /// during tree building.
   final Map<String, String> attributes = {};
 
-  void addChild(Node node) => _children.add(node);
-
-  Iterable<Printable> get children => List.from(_children);
-
+  /// Renders all children and returns concatenated output.
   render(Context context) {
     final b = StringBuffer();
     children.forEach((node) => b.write(node.render(context)));
     return b.toString();
   }
 
+  /// The standard markdown parser splits text content into several text nodes
+  /// when it encounters the escape character. This method combines those
+  /// text pieces into one to enable proper escaping.
   addText(String text) {
-    if (_children.isNotEmpty) {
-      final last = _children.last;
+    if (children.isNotEmpty) {
+      final last = children.last;
       if (last is Text) {
         last.addText(text);
         return;
       }
     }
-    _children.add(Text(text));
+    children.add(Text()..addText(text));
   }
 }
