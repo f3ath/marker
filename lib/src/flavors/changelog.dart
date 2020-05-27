@@ -4,7 +4,7 @@ import 'package:marker/src/flavors/original.dart' as orig;
 class ReleaseLink extends Node {
   render(Context context) {
     final innerText = '[${super.render(context)}]';
-    String href = attributes['href'];
+    var href = attributes['href'];
     if (attributes.containsKey('title')) {
       href += ' "${attributes['title']}"';
     }

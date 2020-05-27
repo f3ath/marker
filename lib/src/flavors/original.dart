@@ -1,28 +1,29 @@
 import 'package:marker/ast.dart';
 
-/**
- * This is an implementation of the original markdown
- * https://daringfireball.net/projects/markdown/syntax
- */
-
+/// This is an implementation of the original markdown
+/// https://daringfireball.net/projects/markdown/syntax
 class Header extends Node {
-  final int level;
-
   Header(this.level);
 
-  render(Context context) => '#' * level + ' ${super.render(context)}\n';
+  final int level;
+
+  @override
+  String render(Context context) => '#' * level + ' ${super.render(context)}\n';
 }
 
 class Paragraph extends Node {
-  render(Context context) => super.render(context) + '\n\n';
+  @override
+  String render(Context context) => super.render(context) + '\n\n';
 }
 
 class LineBreak extends Node {
-  render(Context context) => '  \n';
+  @override
+  String render(Context context) => '  \n';
 }
 
 class BlockQuote extends Node {
-  render(Context context) =>
+  @override
+  String render(Context context) =>
       super
           .render(context)
           .trim()
@@ -33,20 +34,23 @@ class BlockQuote extends Node {
 }
 
 class UnorderedList extends Node {
-  render(Context context) =>
+  @override
+  String render(Context context) =>
       children.map((node) => '- ${node.render(context)}').join() + '\n';
 }
 
 class OrderedList extends Node {
-  render(Context context) {
-    int i = 1;
+  @override
+  String render(Context context) {
+    var i = 1;
     return children.map((node) => '${i++}. ${node.render(context)}').join() +
         '\n';
   }
 }
 
 class ListItem extends Node {
-  render(Context context) {
+  @override
+  String render(Context context) {
     if (children.isNotEmpty && _isBlock(children.first)) {
       return children
               .map((node) {
@@ -76,20 +80,24 @@ class Pre extends Node {}
 class Code extends Node {
   final _buf = StringBuffer();
 
-  render(Context context) {
+  @override
+  String render(Context context) {
     final text = _buf.toString();
     if (text.contains('\n')) return '    ' + text.split('\n').join('\n    ');
-    int fencing = 1;
-    while (text.contains('`' * fencing))
-      fencing++; // Figure out the fencing length
+    var fencing = 1;
+    while (text.contains('`' * fencing)) {
+      fencing++;
+    } // Figure out the fencing length
     return '`' * fencing + text + '`' * fencing;
   }
 
-  addText(String text) => _buf.write(text);
+  @override
+  void addText(String text) => _buf.write(text);
 }
 
 class HorizontalRule extends Node {
-  render(Context context) => '---\n';
+  @override
+  String render(Context context) => '---\n';
 }
 
 class Emphasis extends Node {
@@ -97,13 +105,15 @@ class Emphasis extends Node {
 
   final String mark;
 
-  render(Context context) => '${mark}${super.render(context)}${mark}';
+  @override
+  String render(Context context) => '${mark}${super.render(context)}${mark}';
 }
 
 class Link extends Node {
-  render(Context context) {
+  @override
+  String render(Context context) {
     final innerText = '[${super.render(context)}]';
-    String href = attributes['href'];
+    var href = attributes['href'];
     if (attributes.containsKey('title')) {
       href += ' "${attributes['title']}"';
     }
@@ -118,8 +128,9 @@ class Link extends Node {
 }
 
 class Image extends Node {
-  render(Context context) {
-    String src = attributes['src'];
+  @override
+  String render(Context context) {
+    var src = attributes['src'];
     if (attributes.containsKey('title')) {
       src += ' "${attributes['title']}"';
     }
@@ -135,7 +146,7 @@ class Image extends Node {
 
 int _id = 1; // id generator for images and links
 
-_isBlock(node) =>
+bool _isBlock(node) =>
     node is Header ||
     node is Paragraph ||
     node is BlockQuote ||
