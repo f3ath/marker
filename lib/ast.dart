@@ -54,7 +54,7 @@ class Builder implements md.NodeVisitor {
   }
 }
 
-typedef Node NodeConstructor();
+typedef NodeConstructor = Node Function();
 
 /// The base interface for the rendering tree nodes.
 abstract class PrintableNode {
@@ -69,11 +69,13 @@ abstract class PrintableNode {
 class Text implements PrintableNode {
   final _buf = StringBuffer();
 
-  addText(String text) => _buf.write(text);
+  @override
+  void addText(String text) => _buf.write(text);
 
   /// Escapes common markdown special characters if those could be
   /// misinterpreted.
-  render(Context context) => _buf
+  @override
+  String render(Context context) => _buf
       .toString()
       // dot after a number in the beginning of the string is a list item
       .replaceAllMapped(RegExp(r'^(\d+)\. '), (m) => '${m[1]}\\. ')
@@ -95,7 +97,8 @@ class Node implements PrintableNode {
   final Map<String, String> attributes = {};
 
   /// Renders all children and returns concatenated output.
-  render(Context context) {
+  @override
+  String render(Context context) {
     final b = StringBuffer();
     children.forEach((node) => b.write(node.render(context)));
     return b.toString();
@@ -104,7 +107,8 @@ class Node implements PrintableNode {
   /// The standard markdown parser splits text content into several text nodes
   /// when it encounters the escape character. This method combines those
   /// text pieces into one to enable proper escaping.
-  addText(String text) {
+  @override
+  void addText(String text) {
     if (children.isNotEmpty) {
       final last = children.last;
       if (last is Text) {

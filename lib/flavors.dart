@@ -1,6 +1,6 @@
 import 'package:marker/ast.dart';
-import 'package:marker/src/flavors/original.dart' as orig;
 import 'package:marker/src/flavors/changelog.dart' as chlg;
+import 'package:marker/src/flavors/original.dart' as orig;
 
 /// The original flavor.
 /// See https://daringfireball.net/projects/markdown/syntax

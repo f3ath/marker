@@ -2,9 +2,10 @@ import 'package:marker/ast.dart';
 import 'package:marker/src/flavors/original.dart' as orig;
 
 class ReleaseLink extends Node {
-  render(Context context) {
+  @override
+  String render(Context context) {
     final innerText = '[${super.render(context)}]';
-    String href = attributes['href'];
+    var href = attributes['href'];
     if (attributes.containsKey('title')) {
       href += ' "${attributes['title']}"';
     }
@@ -15,7 +16,8 @@ class ReleaseLink extends Node {
 
 /// Changelog uses a special kind of implicit links inside H2
 class Release extends Node {
-  render(Context context) {
+  @override
+  String render(Context context) {
     final _buf = StringBuffer('## ');
     children.forEach((node) {
       if (node is orig.Link) {

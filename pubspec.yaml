@@ -1,7 +1,6 @@
 name: marker
 description: A renderer (printer) for the markdown library. Saves the parsed AST back into markdown.
-version: 0.0.4
-author: "Alexey Karapetov <karapetov@gmail.com>"
+version: 0.1.0
 homepage: https://github.com/f3ath/marker
 
 environment:
@@ -12,3 +11,4 @@ dependencies:
 
 dev_dependencies:
   test: ^1.0.0
+  pedantic: ^1.9.0
