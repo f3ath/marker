@@ -32,5 +32,4 @@ void main() {
       test(f.path, () => expect(text, f.readAsStringSync().trim()));
     }
   });
-
 }
