@@ -29,16 +29,3 @@ class _ReleaseLink implements Printable {
     return innerText;
   }
 }
-
-class ReleaseLink extends Node {
-  @override
-  String print(Context context) {
-    final innerText = '[${super.print(context)}]';
-    var href = attributes['href']!;
-    if (attributes.containsKey('title')) {
-      href += ' "${attributes['title']}"';
-    }
-    context.references.add('$innerText: $href');
-    return innerText;
-  }
-}
