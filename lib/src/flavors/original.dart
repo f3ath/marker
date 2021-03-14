@@ -8,24 +8,24 @@ class Header extends Node {
   final int level;
 
   @override
-  String render(Context context) => '#' * level + ' ${super.render(context)}\n';
+  String print(Context context) => '#' * level + ' ${super.print(context)}\n';
 }
 
 class Paragraph extends Node {
   @override
-  String render(Context context) => super.render(context) + '\n\n';
+  String print(Context context) => super.print(context) + '\n\n';
 }
 
 class LineBreak extends Node {
   @override
-  String render(Context context) => '  \n';
+  String print(Context context) => '  \n';
 }
 
 class BlockQuote extends Node {
   @override
-  String render(Context context) =>
+  String print(Context context) =>
       super
-          .render(context)
+          .print(context)
           .trim()
           .split('\n')
           .map((line) => ('> ' + line).trim())
@@ -35,43 +35,43 @@ class BlockQuote extends Node {
 
 class UnorderedList extends Node {
   @override
-  String render(Context context) =>
-      children.map((node) => '- ${node.render(context)}').join() + '\n';
+  String print(Context context) =>
+      children.map((node) => '- ${node.print(context)}').join() + '\n';
 }
 
 class OrderedList extends Node {
   @override
-  String render(Context context) {
+  String print(Context context) {
     var i = 1;
-    return children.map((node) => '${i++}. ${node.render(context)}').join() +
+    return children.map((node) => '${i++}. ${node.print(context)}').join() +
         '\n';
   }
 }
 
 class ListItem extends Node {
   @override
-  String render(Context context) {
+  String print(Context context) {
     if (children.isNotEmpty && _isBlock(children.first)) {
       return children
               .map((node) {
                 if (node is BlockQuote) {
                   return '    ' +
-                      node.render(context).split('\n').join('\n    ');
+                      node.print(context).split('\n').join('\n    ');
                 }
                 if (node is Pre) {
                   // A code block in a list gets 3 spaces
                   // despite the standard requiring 4.
                   // @see https://daringfireball.net/projects/markdown/syntax#list
                   // So we have to compensate here.
-                  return '   ' + node.render(context).split('\n').join('\n   ');
+                  return '   ' + node.print(context).split('\n').join('\n   ');
                 }
-                return '    ' + node.render(context).trim();
+                return '    ' + node.print(context).trim();
               })
               .join('\n\n')
               .trim() +
           '\n\n';
     }
-    return super.render(context) + '\n';
+    return super.print(context) + '\n';
   }
 }
 
@@ -81,7 +81,7 @@ class Code extends Node {
   final _buf = StringBuffer();
 
   @override
-  String render(Context context) {
+  String print(Context context) {
     final text = _buf.toString();
     if (text.contains('\n')) return '    ' + text.split('\n').join('\n    ');
     var fencing = 1;
@@ -97,7 +97,7 @@ class Code extends Node {
 
 class HorizontalRule extends Node {
   @override
-  String render(Context context) => '---\n';
+  String print(Context context) => '---\n';
 }
 
 class Emphasis extends Node {
@@ -106,41 +106,41 @@ class Emphasis extends Node {
   final String mark;
 
   @override
-  String render(Context context) => '${mark}${super.render(context)}${mark}';
+  String print(Context context) => '$mark${super.print(context)}$mark';
 }
 
 class Link extends Node {
   @override
-  String render(Context context) {
-    final innerText = '[${super.render(context)}]';
-    var href = attributes['href'];
+  String print(Context context) {
+    final innerText = '[${super.print(context)}]';
+    var href = attributes['href']!;
     if (attributes.containsKey('title')) {
       href += ' "${attributes['title']}"';
     }
 
     if (context.inlineLinks) {
-      return '${innerText}(${href})';
+      return '$innerText($href)';
     }
     final id = '[id${_id++}]';
-    context.references.add('$id: ${href}');
-    return '${innerText}${id}';
+    context.references.add('$id: $href');
+    return '$innerText$id';
   }
 }
 
 class Image extends Node {
   @override
-  String render(Context context) {
-    var src = attributes['src'];
+  String print(Context context) {
+    var src = attributes['src']!;
     if (attributes.containsKey('title')) {
       src += ' "${attributes['title']}"';
     }
     final alt = attributes['alt'] ?? '';
     if (context.inlineImages) {
-      return '![$alt](${src})';
+      return '![$alt]($src)';
     }
     final id = '[id${_id++}]';
-    context.references.add('${id}: ${src}');
-    return '![${alt}]${id}';
+    context.references.add('$id: $src');
+    return '![$alt]$id';
   }
 }
 

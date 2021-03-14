@@ -15,6 +15,15 @@ void main() {
     }
   });
 
+  Directory('test/changelog').listSync().forEach((f) {
+    if (f is File) {
+      final nodes = Document(extensionSet: ExtensionSet.none)
+          .parseLines(f.readAsLinesSync());
+      final text = render(nodes, flavor: flavor.changelog);
+      test(f.path, () => expect(text, f.readAsStringSync().trim()));
+    }
+  });
+
   Directory('test/original/reference').listSync().forEach((f) {
     if (f is File) {
       final nodes = Document(extensionSet: ExtensionSet.none)
@@ -24,12 +33,4 @@ void main() {
     }
   });
 
-  Directory('test/changelog').listSync().forEach((f) {
-    if (f is File) {
-      final nodes = Document(extensionSet: ExtensionSet.none)
-          .parseLines(f.readAsLinesSync());
-      final text = render(nodes, flavor: flavor.changelog);
-      test(f.path, () => expect(text, f.readAsStringSync().trim()));
-    }
-  });
 }

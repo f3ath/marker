@@ -1,6 +1,7 @@
 import 'package:markdown/markdown.dart' as md;
 import 'package:marker/ast.dart';
 import 'package:marker/flavors.dart' as flavors;
+import 'package:marker/src/ast/builder.dart';
 
 /// Renders the given list of [nodes] into a markdown string.
 /// [inlineLinks] and [inlineImages] flags control whether the images and links
@@ -12,9 +13,9 @@ import 'package:marker/flavors.dart' as flavors;
 String render(List<md.Node> nodes,
     {bool inlineImages = true,
     bool inlineLinks = true,
-    Map<String, NodeConstructor> flavor}) {
+    Map<String, Node Function()>? flavor}) {
   final context = Context(inlineImages, inlineLinks);
   final builder = Builder(flavor ?? flavors.original);
   nodes.forEach((node) => node.accept(builder));
-  return (builder.root.render(context) + context.references.join('\n')).trim();
+  return (builder.root.print(context) + context.references.join('\n')).trim();
 }
