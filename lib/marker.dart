@@ -10,7 +10,7 @@ import 'package:marker/src/ast/builder.dart';
 /// see [Builder] for details. By default, the
 /// [original](https://daringfireball.net/projects/markdown) markdown
 /// flavor will be used.
-String render(List<md.Node> nodes,
+String render(Iterable<md.Node> nodes,
     {bool inlineImages = true,
     bool inlineLinks = true,
     Map<String, Node Function()>? flavor}) {
