@@ -8,17 +8,18 @@ class Header extends Node {
   final int level;
 
   @override
-  String print(Context context) => '#' * level + ' ${super.print(context)}\n';
+  String print(Context context) =>
+      '#' * level + ' ${super.print(context)}' + context.lineBreak;
 }
 
 class Paragraph extends Node {
   @override
-  String print(Context context) => super.print(context) + '\n\n';
+  String print(Context context) => super.print(context) + context.lineBreak * 2;
 }
 
 class LineBreak extends Node {
   @override
-  String print(Context context) => '  \n';
+  String print(Context context) => '  ' + context.lineBreak;
 }
 
 class BlockQuote extends Node {
@@ -27,25 +28,28 @@ class BlockQuote extends Node {
       super
           .print(context)
           .trim()
-          .split('\n')
+          .split(context.lineBreak)
           .map((line) => ('> ' + line).trim())
-          .join('\n') +
-      '\n\n';
+          .join(context.lineBreak) +
+      context.lineBreak * 2;
 }
 
 class UnorderedList extends Node {
   @override
   String print(Context context) =>
-      children.map((node) => '- ${node.print(context)}').join() + '\n';
+      children.map((node) => '- ${node.print(context)}').join() +
+      context.lineBreak;
 }
 
 class OrderedList extends Node {
   @override
-  String print(Context context) {
-    var i = 1;
-    return children.map((node) => '${i++}. ${node.print(context)}').join() +
-        '\n';
-  }
+  String print(Context context) =>
+      children
+          .asMap()
+          .entries
+          .map((e) => '${e.key + 1}. ${e.value.print(context)}')
+          .join() +
+      context.lineBreak;
 }
 
 class ListItem extends Node {
@@ -56,22 +60,29 @@ class ListItem extends Node {
               .map((node) {
                 if (node is BlockQuote) {
                   return '    ' +
-                      node.print(context).split('\n').join('\n    ');
+                      node
+                          .print(context)
+                          .split(context.lineBreak)
+                          .join(context.lineBreak + '    ');
                 }
                 if (node is Pre) {
                   // A code block in a list gets 3 spaces
                   // despite the standard requiring 4.
                   // @see https://daringfireball.net/projects/markdown/syntax#list
                   // So we have to compensate here.
-                  return '   ' + node.print(context).split('\n').join('\n   ');
+                  return ' ' * 3 +
+                      node
+                          .print(context)
+                          .split(context.lineBreak)
+                          .join(context.lineBreak + ' ' * 3);
                 }
-                return '    ' + node.print(context).trim();
+                return ' ' * 4 + node.print(context).trim();
               })
-              .join('\n\n')
+              .join(context.lineBreak * 2)
               .trim() +
-          '\n\n';
+          context.lineBreak * 2;
     }
-    return super.print(context) + '\n';
+    return super.print(context) + context.lineBreak;
   }
 }
 
@@ -83,7 +94,10 @@ class Code extends Node {
   @override
   String print(Context context) {
     final text = _buf.toString();
-    if (text.contains('\n')) return '    ' + text.split('\n').join('\n    ');
+    if (text.contains(context.lineBreak)) {
+      return ' ' * 4 +
+          text.split(context.lineBreak).join(context.lineBreak + ' ' * 4);
+    }
     var fencing = 1;
     while (text.contains('`' * fencing)) {
       fencing++;
@@ -97,7 +111,7 @@ class Code extends Node {
 
 class HorizontalRule extends Node {
   @override
-  String print(Context context) => '---\n';
+  String print(Context context) => '---' + context.lineBreak;
 }
 
 class Emphasis extends Node {

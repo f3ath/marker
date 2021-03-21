@@ -11,7 +11,7 @@ class Release extends Node {
           .map((node) => node is Link ? _ReleaseLink(node) : node)
           .map((node) => node.print(context))
           .join() +
-      '\n';
+      context.lineBreak;
 }
 
 class _ReleaseLink implements Printable {

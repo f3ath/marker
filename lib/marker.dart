@@ -13,9 +13,12 @@ import 'package:marker/src/ast/builder.dart';
 String render(Iterable<md.Node> nodes,
     {bool inlineImages = true,
     bool inlineLinks = true,
+    String lineBreak = '\n',
     Map<String, Node Function()>? flavor}) {
-  final context = Context(inlineImages, inlineLinks);
+  final context = Context(inlineImages, inlineLinks, lineBreak: lineBreak);
   final builder = Builder(flavor ?? flavors.original);
   nodes.forEach((node) => node.accept(builder));
-  return (builder.root.print(context) + context.references.join('\n')).trim();
+  return (builder.root.print(context) +
+          context.references.join(context.lineBreak))
+      .trim();
 }

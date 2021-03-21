@@ -6,7 +6,7 @@ import 'package:marker/marker.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory('test/original/inline').listSync().forEach((f) {
+  Directory('test/original').listSync().forEach((f) {
     if (f is File) {
       final nodes = Document(extensionSet: ExtensionSet.none)
           .parseLines(f.readAsLinesSync());
