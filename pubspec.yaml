@@ -1,16 +1,22 @@
 name: marker
 description: A renderer (printer) for the markdown library. Renders the parsed AST back into markdown.
-version: 0.2.2
+version: 0.2.3
 homepage: https://github.com/f3ath/marker
 
+cider:
+  link_template:
+    tag: https://github.com/f3ath/marker/releases/tag/%tag%
+    diff: https://github.com/f3ath/marker/compare/%from%...%to%
+
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.15.1 <3.0.0'
 
 dependencies:
   markdown: ^4.0.0
 
 dev_dependencies:
   test: ^1.16.0
-  pedantic: ^1.11.0
+  lints: ^1.0.1
   coverage: ^1.0.1
   check_coverage: ^0.0.1
+  cider: ^0.1.1
