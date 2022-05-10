@@ -1,7 +1,7 @@
 import 'package:marker/src/ast/context.dart';
-import 'package:marker/src/ast/printable.dart';
+import 'package:marker/src/ast/renderable.dart';
 
-class Text implements Printable {
+class Text implements Renderable {
   Text(this.text);
 
   final String text;
@@ -9,7 +9,7 @@ class Text implements Printable {
   /// Escapes common markdown special characters if those could be
   /// misinterpreted.
   @override
-  String print(Context context) => text
+  String render(Context context) => text
       // dot after a number in the beginning of the string is a list item
       .replaceAllMapped(RegExp(r'^(\d+)\. '), (m) => '${m[1]}\\. ')
       // Special markdown chars: emphasis, strikethrough, table cell, links
