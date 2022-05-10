@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Bumped markdown dependency to 5.0.0
+- Renamed Printable to Renderable
 
 ## [0.2.3] - 2021-12-28
 ### Added
