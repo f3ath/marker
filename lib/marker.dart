@@ -19,7 +19,7 @@ String render(Iterable<md.Node> nodes,
   for (final node in nodes) {
     node.accept(builder);
   }
-  return (builder.root.print(context) +
+  return (builder.root.render(context) +
           context.references.join(context.lineBreak))
       .trim();
 }
