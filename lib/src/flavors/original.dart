@@ -11,7 +11,7 @@ class Header extends Node {
 
   @override
   String render(Context context) =>
-      '#' * level + ' ${super.render(context)}' + context.lineBreak;
+      '${'#' * level} ${super.render(context)}${context.lineBreak}';
 }
 
 class Paragraph extends Node {
@@ -22,7 +22,7 @@ class Paragraph extends Node {
 
 class LineBreak extends Node {
   @override
-  String render(Context context) => '  ' + context.lineBreak;
+  String render(Context context) => '  ${context.lineBreak}';
 }
 
 class BlockQuote extends Node {
@@ -140,7 +140,7 @@ class Code extends Node {
 
 class HorizontalRule extends Node {
   @override
-  String render(Context context) => '---' + context.lineBreak;
+  String render(Context context) => '---${context.lineBreak}';
 }
 
 class Emphasis extends Node {

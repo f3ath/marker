@@ -6,7 +6,7 @@ class TreePrinter implements NodeVisitor {
 
   @override
   bool visitElementBefore(Element element) {
-    print(_indent * level + '${element.tag}${element.attributes}');
+    print('${_indent * level}${element.tag}${element.attributes}');
     level++;
     return true;
   }
@@ -18,6 +18,6 @@ class TreePrinter implements NodeVisitor {
 
   @override
   void visitText(Text text) {
-    print(_indent * level + 'Text: $text');
+    print('${_indent * level}Text: $text');
   }
 }

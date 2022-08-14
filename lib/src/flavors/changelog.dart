@@ -5,13 +5,12 @@ import 'package:marker/src/flavors/original.dart';
 /// Changelog uses a special kind of implicit links inside H2
 class Release extends Node {
   @override
-  String render(Context context) =>
-      '## ' +
-      children
-          .map((node) => node is Link ? _Link(node) : node)
-          .map((node) => node.render(context))
-          .join() +
-      context.lineBreak;
+  String render(Context context) => '## ${_title(context)}${context.lineBreak}';
+
+  String _title(Context context) => children
+      .map((it) => it is Link ? _Link(it) : it)
+      .map((it) => it.render(context))
+      .join();
 }
 
 class _Link implements Renderable {
