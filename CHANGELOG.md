@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2023-02-14
+### Added
+- Dart 3 support
+
 ## [0.5.0] - 2023-02-14
 ### Changed
 - Bumped `markdown` to 7.0.0
@@ -75,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial library version
 
+[0.5.1]: https://github.com/f3ath/marker/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/f3ath/marker/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/f3ath/marker/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/f3ath/marker/compare/0.2.3...0.3.0
