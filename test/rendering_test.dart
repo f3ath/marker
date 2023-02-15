@@ -8,28 +8,28 @@ import 'package:test/test.dart';
 void main() {
   Directory('test/original').listSync().forEach((f) {
     if (f is File) {
-      final nodes = Document(extensionSet: ExtensionSet.none)
-          .parseLines(f.readAsLinesSync());
-      final text = render(nodes);
+      final text = render(readNodes(f));
       test(f.path, () => expect(text, f.readAsStringSync().trim()));
     }
   });
 
   Directory('test/changelog').listSync().forEach((f) {
     if (f is File) {
-      final nodes = Document(extensionSet: ExtensionSet.none)
-          .parseLines(f.readAsLinesSync());
-      final text = render(nodes, flavor: flavor.changelog);
+      final text = render(readNodes(f), flavor: flavor.changelog);
       test(f.path, () => expect(text, f.readAsStringSync().trim()));
     }
   });
 
   Directory('test/original/reference').listSync().forEach((f) {
     if (f is File) {
-      final nodes = Document(extensionSet: ExtensionSet.none)
-          .parseLines(f.readAsLinesSync());
-      final text = render(nodes, inlineImages: false, inlineLinks: false);
+      final text =
+          render(readNodes(f), inlineImages: false, inlineLinks: false);
       test(f.path, () => expect(text, f.readAsStringSync().trim()));
     }
   });
 }
+
+List<Node> readNodes(File file) => Document(
+      extensionSet: ExtensionSet.none,
+      encodeHtml: false,
+    ).parseLines(file.readAsLinesSync());
