@@ -56,25 +56,22 @@ class OrderedList extends Node {
 class ListItem extends Node {
   @override
   String render(Context context) {
-    if (children.isNotEmpty) {
-      if (_isBlock(children.first)) {
-        return _renderBlockChildren(context);
-      }
+    if (children.isNotEmpty && _isBlock(children.first)) {
+      return _renderBlockChildren(context);
     }
     return children
-            .map((node) {
-              if (node is OrderedList || node is UnorderedList) {
-                // We have a sublist. It must be separated from the previous
-                // text node and from other block elements.
-                final indent = (node is UnorderedList) ? 2 : 4;
-                return context.lineBreak +
-                    node
-                        .render(context)
-                        .addLinePrefix(' ' * indent, context.lineBreak) +
-                    context.lineBreak;
-              }
-              return node.render(context);
-            })
+            .map((node) => switch (node) {
+                  OrderedList() ||
+                  UnorderedList() =>
+                    // We have a sublist. It must be separated from the previous
+                    // text node and from other block elements.
+                    context.lineBreak +
+                        node.render(context).addLinePrefix(
+                            ' ' * ((node is UnorderedList) ? 2 : 4),
+                            context.lineBreak) +
+                        context.lineBreak,
+                  _ => node.render(context)
+                })
             .join()
             .trim() +
         context.lineBreak;
@@ -82,33 +79,33 @@ class ListItem extends Node {
 
   String _renderBlockChildren(Context context) =>
       children
-          .map((node) {
-            if (node is BlockQuote) {
-              return node
-                  .render(context)
-                  .addLinePrefix(' ' * 4, context.lineBreak);
-            }
-            if (node is Pre) {
-              // A code block in a list gets 3 spaces
-              // despite the standard requiring 4.
-              // @see https://daringfireball.net/projects/markdown/syntax#list
-              // So we have to compensate here.
-              return node
-                  .render(context)
-                  .addLinePrefix(' ' * 3, context.lineBreak);
-            }
-            return ' ' * 4 + node.render(context).trim();
-          })
+          .map((node) => switch (node) {
+                BlockQuote() => node
+                    .render(context)
+                    .addLinePrefix(' ' * 4, context.lineBreak),
+                Pre() =>
+                  // A code block in a list gets 3 spaces
+                  // despite the standard requiring 4.
+                  // @see https://daringfireball.net/projects/markdown/syntax#list
+                  // So we have to compensate here.
+                  node
+                      .render(context)
+                      .addLinePrefix(' ' * 3, context.lineBreak),
+                _ => ' ' * 4 + node.render(context).trim()
+              })
           .join(context.lineBreak * 2)
           .trim() +
       context.lineBreak * 2;
 
-  bool _isBlock(node) =>
-      node is Header ||
-      node is Paragraph ||
-      node is BlockQuote ||
-      node is OrderedList ||
-      node is UnorderedList;
+  bool _isBlock(node) => switch (node) {
+        Header() ||
+        Paragraph() ||
+        BlockQuote() ||
+        OrderedList() ||
+        UnorderedList() =>
+          true,
+        _ => false
+      };
 }
 
 class Pre extends Node {}
@@ -122,20 +119,11 @@ class Code extends Node {
     if (text.contains(context.lineBreak)) {
       return text.addLinePrefix(' ' * 4, context.lineBreak);
     }
-    final fencing = _detectFencing(text);
-    return fencing + text + fencing;
+    return text.fenced('`');
   }
 
   @override
   void addText(String text) => _buf.write(text);
-
-  String _detectFencing(String text) {
-    var fencing = '';
-    do {
-      fencing += '`';
-    } while (text.contains(fencing));
-    return fencing;
-  }
 }
 
 class HorizontalRule extends Node {
@@ -157,16 +145,15 @@ class Link extends Node {
   String render(Context context) {
     final innerText = '[${super.render(context)}]';
     var href = attributes['href']!;
-    if (attributes.containsKey('title')) {
-      href += ' "${attributes['title']}"';
+    if (attributes case {'title': String title}) {
+      href += ' "$title"';
     }
-
     if (context.inlineLinks) {
       return '$innerText($href)';
     }
-    final id = '[id${_id++}]';
-    context.references.add('$id: $href');
-    return '$innerText$id';
+    final id = context.nextId();
+    context.ref[id] = href;
+    return '$innerText[$id]';
   }
 }
 
@@ -174,20 +161,18 @@ class Image extends Node {
   @override
   String render(Context context) {
     var src = attributes['src']!;
-    if (attributes.containsKey('title')) {
-      src += ' "${attributes['title']}"';
+    if (attributes case {'title': String title}) {
+      src += ' "$title"';
     }
     final alt = attributes['alt'] ?? '';
     if (context.inlineImages) {
       return '![$alt]($src)';
     }
-    final id = '[id${_id++}]';
-    context.references.add('$id: $src');
-    return '![$alt]$id';
+    final id = context.nextId();
+    context.ref[id] = src;
+    return '![$alt][$id]';
   }
 }
-
-int _id = 1; // id generator for images and links
 
 extension _StringExt on String {
   static const _splitter = LineSplitter();
@@ -196,7 +181,15 @@ extension _StringExt on String {
   addLinePrefix(String prefix, String lineBreak, {bool trim = false}) =>
       _splitter
           .convert(this)
-          .map((_) => prefix + _)
-          .map((_) => trim ? _.trim() : _)
+          .map((it) => prefix + it)
+          .map((it) => trim ? it.trim() : it)
           .join(lineBreak);
+
+  String fenced(String block) {
+    var fence = '';
+    do {
+      fence += block;
+    } while (contains(fence));
+    return fence + this + fence;
+  }
 }

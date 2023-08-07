@@ -5,16 +5,16 @@ import 'package:marker/src/ast/text.dart';
 /// The base rendering tree node.
 class Node implements Renderable {
   /// Node's children
-  final List<Renderable> children = [];
+  final children = <Renderable>[];
 
   /// Attributes are copied from the corresponding parsed tree
   /// during tree building.
-  final Map<String, String> attributes = {};
+  final attributes = <String, String>{};
 
   /// Renders all children and returns concatenated output.
   @override
   String render(Context context) =>
-      children.map((node) => node.render(context)).join();
+      children.map((it) => it.render(context)).join();
 
   /// Adds a child text node
   void addText(String text) {

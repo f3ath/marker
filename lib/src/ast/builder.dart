@@ -6,12 +6,10 @@ import 'package:marker/src/ast/node.dart';
 /// element in the parsed tree the [Node] producer returns a node of
 /// the rendering tree.
 class Builder implements md.NodeVisitor {
-  Builder(this.flavor) {
-    _stack.add(Node());
-  }
+  Builder(this.flavor);
 
   final Map<String, Node Function()> flavor;
-  final List<Node> _stack = [];
+  final _stack = [Node()];
 
   /// Contains the root of the rendering tree
   Node get root => _stack.last;
@@ -30,8 +28,7 @@ class Builder implements md.NodeVisitor {
 
   @override
   bool visitElementBefore(md.Element element) {
-    final tag = element.tag;
-    final node = flavor[tag]?.call() ?? Node();
+    final node = flavor[element.tag]?.call() ?? Node();
     node.attributes.addAll(element.attributes);
     _stack.add(node);
     return true;

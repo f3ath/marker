@@ -20,6 +20,8 @@ String render(Iterable<md.Node> nodes,
     node.accept(builder);
   }
   return (builder.root.render(context) +
-          context.references.join(context.lineBreak))
+          context.ref.entries
+              .map((e) => '[${e.key}]: ${e.value}')
+              .join(context.lineBreak))
       .trim();
 }

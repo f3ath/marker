@@ -20,12 +20,11 @@ class _Link implements Renderable {
 
   @override
   String render(Context context) {
-    final innerText =
-        '[${_link.children.map((e) => e.render(context)).join()}]';
+    final innerText = _link.children.map((e) => e.render(context)).join();
     var href = _link.attributes['href']!;
     final title = _link.attributes['title'];
     if (title != null) href += ' "$title"';
-    context.references.add('$innerText: $href');
-    return innerText;
+    context.ref[innerText] = href;
+    return '[$innerText]';
   }
 }

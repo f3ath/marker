@@ -4,7 +4,7 @@ import 'package:marker/src/flavors/original.dart';
 
 /// The original flavor.
 /// See https://daringfireball.net/projects/markdown/syntax
-final Map<String, Node Function()> original = {
+final original = <String, Node Function()>{
   'h1': () => Header(1),
   'h2': () => Header(2),
   'h3': () => Header(3),
@@ -27,7 +27,7 @@ final Map<String, Node Function()> original = {
 };
 
 /// The changelog flavor.
-final Map<String, Node Function()> changelog = {
+final changelog = <String, Node Function()>{
   ...original,
   'h2': () => Release(), // Release header is special
 };

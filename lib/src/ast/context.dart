@@ -2,6 +2,9 @@
 class Context {
   Context(this.inlineImages, this.inlineLinks, {this.lineBreak = '\n'});
 
+  /// Returns the next generated id for images and links.
+  String nextId() => 'id${_id++}';
+
   /// Whether the images should be rendered inline (or as references)
   final bool inlineImages;
 
@@ -14,5 +17,8 @@ class Context {
   /// Accumulates references to images and links generated during rendering.
   /// When the rendering is done, these lines will be added to the bottom
   /// of the generated document.
-  final List<String> references = [];
+  final ref = <String, String>{};
+
+  /// Internal id generator.
+  int _id = 1;
 }
